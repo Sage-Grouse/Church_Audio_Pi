@@ -1,0 +1,6 @@
+[Unit]
+Description=Mount the permanent CHURCHMUSIC output drive
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'mountpoint -q /mnt/church_music || /bin/mount /mnt/church_music'

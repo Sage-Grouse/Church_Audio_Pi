@@ -1,0 +1,26 @@
+[Unit]
+Description=Process church audio from USB device %i
+After=local-fs.target graphical.target
+
+[Service]
+Type=oneshot
+User=church-pi
+
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/church-pi/.Xauthority
+
+# The mp3 output goes to this separate, permanently-connected
+# drive, never the Yamaha recording drive. This mountpoint is set up via
+# /etc/fstab so it's always present at boot — see SETUP_NOTES.md.
+Environment=OUTPUT_PATH=/mnt/church_music
+
+ExecStartPre=/bin/sh -c 'mountpoint -q /mnt/church_usb || /usr/bin/sudo /bin/mount -o uid=1000,gid=1000,fmask=0022,dmask=0022 /dev/%i /mnt/church_usb'
+
+ExecStart=/home/church-pi/church_audio_env/bin/python3 /home/church-pi/Documents/audio_exporter.py --input /mnt/church_usb
+
+ExecStopPost=/bin/sh -c 'mountpoint -q /mnt/church_usb && /usr/bin/sudo /bin/umount /mnt/church_usb || true'
+
+TimeoutStartSec=5400
+
+StandardOutput=journal
+StandardError=journal

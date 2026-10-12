@@ -1,0 +1,16 @@
+# Matches ANY inserted USB drive EXCEPT the known output drive
+# (excluded by its label). Some drives have no partition table and carry the
+# filesystem on the raw device (sda); the first line catches those, and the
+# second catches normal partitioned drives (sda1). Only the node that actually
+# carries a filesystem matches, so one drive does not trigger both lines.
+ACTION=="add", SUBSYSTEM=="block", KERNEL=="sd[a-z]", ENV{ID_FS_USAGE}=="filesystem", ENV{ID_FS_LABEL}!="CHURCHMUSIC", TAG+="systemd", ENV{SYSTEMD_WANTS}+="church-audio@%k.service"
+ACTION=="add", SUBSYSTEM=="block", KERNEL=="sd[a-z][0-9]", ENV{ID_FS_USAGE}=="filesystem", ENV{ID_FS_LABEL}!="CHURCHMUSIC", TAG+="systemd", ENV{SYSTEMD_WANTS}+="church-audio@%k.service"
+
+# The output drive is meant to stay permanently connected, mounted via the
+# /etc/fstab entry at /mnt/church_music. But fstab only applies at boot or on
+# a manual `mount -a`; it does NOT remount a drive that is unplugged and
+# replugged later. This rule handles that case by starting a small dedicated
+# systemd service (mount-church-music.service). An inline RUN+= command is not
+# used here because udev runs those in a restricted worker context that is
+# only reliable for instant commands, and a mount can take longer.
+ACTION=="add", SUBSYSTEM=="block", KERNEL=="sd[a-z][0-9]", ENV{ID_FS_LABEL}=="CHURCHMUSIC", TAG+="systemd", ENV{SYSTEMD_WANTS}+="mount-church-music.service"

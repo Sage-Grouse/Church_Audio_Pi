@@ -1,0 +1,23 @@
+# Secrets - never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Audio files
+*.wav
+*.mp3
+
+# Python
+__pycache__/
+*.pyc
+church_audio_env/
+venv/
+.venv/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

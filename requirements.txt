@@ -1,0 +1,6 @@
+pydub
+psutil
+paramiko
+python-dotenv
+# pydub needs this on Python 3.13+ (the audioop module was removed from the standard library)
+audioop-lts; python_version >= "3.13"
